@@ -7,6 +7,11 @@
             [nevergreen.security :as security]
             [nevergreen.crypto :as crypt]))
 
+(defn interesting
+  "Filters projects to only include sick, healthy building, sick building or projects with an unknown prognosis"
+  [projects]
+  (filtering/by-prognosis [:sick :sick-building :unknown] projects))
+
 (defn invalid-url? [url]
   (or (blank? url)
       (not (re-find #"https?://" url))))
@@ -34,7 +39,7 @@
     (->> (parser/get-projects
            (http-get (:url tray) (set-auth-header (:username tray) decrypted-password))
            {:normalise true :server (get-server-type tray)})
-         (filtering/interesting)
+         (interesting)
          (filtering/by-name (:included tray))
          (add-tray-id (:trayId tray)))))
 
